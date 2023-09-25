@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 import { sentenceCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 // @mui
 import {
   Card,
@@ -35,7 +35,7 @@ import USERLIST from '../_mock/user';
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
+  { id: 'area', label: 'area', alignRight: false },
   { id: 'role', label: 'Role', alignRight: false },
   { id: 'isVerified', label: 'Verified', alignRight: false },
   { id: 'status', label: 'Status', alignRight: false },
@@ -74,6 +74,7 @@ function applySortFilter(array, comparator, query) {
 }
 
 export default function UserPage() {
+  const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -87,6 +88,17 @@ export default function UserPage() {
   const [filterName, setFilterName] = useState('');
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+
+  useEffect(() => {
+    fetch('http://localhost:8000/api/usuarios/')
+      .then((response) => response.json())
+      .then((response) => {
+        setUsers(response.usuarios);
+        console.log(response.usuarios);
+      })
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -104,7 +116,7 @@ export default function UserPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = USERLIST.map((n) => n.name);
+      const newSelecteds = users.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -140,9 +152,9 @@ export default function UserPage() {
     setFilterName(event.target.value);
   };
 
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - users.length) : 0;
 
-  const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(users, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
 
@@ -163,7 +175,12 @@ export default function UserPage() {
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            type="user"
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -172,14 +189,14 @@ export default function UserPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={USERLIST.length}
+                  rowCount={users.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { id, name, role, status, area, avatarUrl, isVerified } = row;
                     const selectedUser = selected.indexOf(name) !== -1;
 
                     return (
@@ -197,7 +214,7 @@ export default function UserPage() {
                           </Stack>
                         </TableCell>
 
-                        <TableCell align="left">{company}</TableCell>
+                        <TableCell align="left">{area}</TableCell>
 
                         <TableCell align="left">{role}</TableCell>
 
@@ -252,7 +269,7 @@ export default function UserPage() {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={USERLIST.length}
+            count={users.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

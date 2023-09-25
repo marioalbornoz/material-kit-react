@@ -5,32 +5,32 @@ import { Box, MenuItem, Stack, IconButton, Popover } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-const LANGS = [
-  {
-    value: 'en',
-    label: 'English',
-    icon: '/assets/icons/ic_flag_en.svg',
-  },
-  {
-    value: 'de',
-    label: 'German',
-    icon: '/assets/icons/ic_flag_de.svg',
-  },
-  {
-    value: 'fr',
-    label: 'French',
-    icon: '/assets/icons/ic_flag_fr.svg',
-  },
-];
+// const LANGS = [
+//   {
+//     value: 'en',
+//     label: 'English',
+//     icon: '/assets/icons/ic_flag_en.svg',
+//   },
+//   {
+//     value: 'de',
+//     label: 'German',
+//     icon: '/assets/icons/ic_flag_de.svg',
+//   },
+//   {
+//     value: 'fr',
+//     label: 'French',
+//     icon: '/assets/icons/ic_flag_fr.svg',
+//   },
+// ];
 
 // ----------------------------------------------------------------------
 
 export default function LanguagePopover() {
   const [open, setOpen] = useState(null);
 
-  const handleOpen = (event) => {
-    setOpen(event.currentTarget);
-  };
+  // const handleOpen = (event) => {
+  //   setOpen(event.currentTarget);
+  // };
 
   const handleClose = () => {
     setOpen(null);
@@ -38,7 +38,7 @@ export default function LanguagePopover() {
 
   return (
     <>
-      <IconButton
+      {/* <IconButton
         onClick={handleOpen}
         sx={{
           padding: 0,
@@ -50,7 +50,7 @@ export default function LanguagePopover() {
         }}
       >
         <img src={LANGS[0].icon} alt={LANGS[0].label} />
-      </IconButton>
+      </IconButton> */}
 
       <Popover
         open={Boolean(open)}
@@ -72,7 +72,7 @@ export default function LanguagePopover() {
           },
         }}
       >
-        <Stack spacing={0.75}>
+        {/* <Stack spacing={0.75}>
           {LANGS.map((option) => (
             <MenuItem key={option.value} selected={option.value === LANGS[0].value} onClick={() => handleClose()}>
               <Box component="img" alt={option.label} src={option.icon} sx={{ width: 28, mr: 2 }} />
@@ -80,7 +80,7 @@ export default function LanguagePopover() {
               {option.label}
             </MenuItem>
           ))}
-        </Stack>
+        </Stack> */}
       </Popover>
     </>
   );

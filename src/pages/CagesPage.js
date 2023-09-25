@@ -1,14 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
-import { useState } from 'react';
 // @mui
 import {
   Card,
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
   Popover,
   Checkbox,
@@ -23,6 +20,8 @@ import {
   TablePagination,
 } from '@mui/material';
 // components
+import { useState } from 'react';
+import Modal from '../components/modal';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
@@ -62,13 +61,19 @@ function getComparator(order, orderBy) {
 
 function applySortFilter(array, comparator, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
+  console.log(stabilizedThis);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
     return a[1] - b[1];
   });
   if (query) {
-    return filter(array, (_user) => _user.name.toLowerCase().indexOf(query.toLowerCase()) !== -1);
+    const expresion = new RegExp(`${query}.*`, "i");
+    console.log("query", expresion);
+    console.log("lista", array);
+  const listado = filter(array, (_jaula) =>  expresion.test(_jaula.jaula) );
+  console.log(listado);
+    return listado
   }
   return stabilizedThis.map((el) => el[0]);
 }
@@ -140,6 +145,7 @@ export default function CagesPage() {
     setFilterName(event.target.value);
   };
 
+  
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - CAGESLIST.length) : 0;
 
   const filteredUsers = applySortFilter(CAGESLIST, getComparator(order, orderBy), filterName);
@@ -163,7 +169,7 @@ export default function CagesPage() {
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
+          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} type="cage" />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -279,10 +285,7 @@ export default function CagesPage() {
           },
         }}
       >
-        <MenuItem>
-          <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+        <Modal />
 
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />

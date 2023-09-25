@@ -20,6 +20,11 @@ const navConfig = [
     icon: icon('user'),
   },
   {
+    title: 'andenHUB',
+    path: '/dashboard/anden',
+    icon: icon('camion'),
+  },
+  {
     title: 'store',
     path: '/dashboard/products',
     icon: icon('store'),

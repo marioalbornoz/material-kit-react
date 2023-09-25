@@ -13,13 +13,13 @@ import CagesPage from './pages/CagesPage';
 
 // ----------------------------------------------------------------------
 
-export default function Router() {
+export default function Router({usuario, setUsuario}) {
   const routes = useRoutes([
     {
       path: '/dashboard',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        // { element: <Navigate to="/login" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'jaulas', element: <CagesPage /> },
         { path: 'user', element: <UserPage /> },
@@ -29,12 +29,15 @@ export default function Router() {
     },
     {
       path: 'login',
-      element: <LoginPage />,
+      element: <LoginPage usuario={usuario} setUsuario={ setUsuario}/>,
+      children:[
+        { path: '*', element: <Navigate to="/login" />, index: true  },
+      ]
     },
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
+        { element: <Navigate to="/dashboard/app" />, index: true }, // si esta logueado resirigir a /dashboard/app sino a /login
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
