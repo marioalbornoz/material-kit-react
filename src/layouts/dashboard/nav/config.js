@@ -13,6 +13,10 @@ const navConfig = [
     title: 'jaulas',
     path: '/dashboard/jaulas',
     icon: icon('cages'),
+  },{
+    title: 'tiendas SG',
+    path: '/dashboard/tiendas',
+    icon: icon('store'),
   },
   {
     title: 'user',

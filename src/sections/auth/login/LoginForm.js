@@ -1,20 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 // @mui
 import { Link, Stack, IconButton, InputAdornment, TextField, Checkbox } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 // components
+import useAuth from '../../../hooks/useAuth';
 import Iconify from '../../../components/iconify';
 
 // ----------------------------------------------------------------------
 
-export default function LoginForm({ setUsuario}) {
+export default function LoginForm() {
   const navigate = useNavigate();
+  const { isAuthenticated, auth, setAuth} = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [init, setInit] = useState(false);
+
   useEffect(() => {
     const requestOptions = {
       method: 'POST',
@@ -25,12 +28,12 @@ export default function LoginForm({ setUsuario}) {
     // validar si existe el usuario y contraseña
     if(init){
       fetch('http://localhost:8000/api/usuarios/login', requestOptions).then(response => response.json())
-      .then(data => {setUsuario(data)
-        if (data) {
-          navigate('/dashboard', { replace: true });
+      .then(data => {setAuth(data)
+        if (data.name) {
+          navigate('/dashboard/app', { replace: true });
         }})
     }
-  }, [email, password, init, navigate, setUsuario]);
+  }, [email, password, init, navigate, setAuth]);
 
 
   const handleClick = () => {

@@ -399,7 +399,5 @@ const products = [
     "status": "sale"
   }
 ]
-console.log('====================================');
-console.log(products);
-console.log('====================================');
+
 export default products;

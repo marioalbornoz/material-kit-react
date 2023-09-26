@@ -1,9 +1,12 @@
 import * as React from 'react';
+import PropTypes from 'prop-types';
+
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import {MenuItem} from '@mui/material';
 import Iconify from "../iconify/Iconify";
+import FormsControl from '../forms/FormsControl';
 
 
 const style = {
@@ -19,17 +22,23 @@ const style = {
   p: 4,
 };
 
-export default function Modals() {
+Modals.propTypes = {
+  option: PropTypes.object,
+ 
+};
+
+
+export default function Modals({option, setEstado, setStore, store}) {
   const [open, setOpen] = React.useState(false);
+
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-
   return (
     <div>
       {/* <Button onClick={handleOpen}>Editar</Button> */}
       <MenuItem onClick={handleOpen}>
           <Iconify  icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit 
+          Edit
         </MenuItem>
       <Modal
         open={open}
@@ -38,12 +47,10 @@ export default function Modals() {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
+          <Typography id="modal-modal-title" variant="h6" component="h3" >
+            Editar estado {option.destino}
           </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+          <FormsControl option={option}  setStore={setStore} store={store} />
         </Box>
       </Modal>
     </div>

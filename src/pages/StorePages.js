@@ -10,7 +10,6 @@ import {
   Popover,
   Checkbox,
   TableRow,
-  MenuItem,
   TableBody,
   TableCell,
   Container,
@@ -28,14 +27,14 @@ import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 // mock
-// import CAGESLIST from '../_mock/cages';
+// import storeLIST from '../_mock/store';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'cage', label: 'Jaula', alignRight: false },
-  { id: 'warehouse', label: 'Bodega', alignRight: false },
-  { id: 'hub', label: 'Hub', alignRight: false },
+  { id: 'destiny', label: 'Destino', alignRight: false },
+  { id: 'origin', label: 'Origen', alignRight: false },
+  { id: 'type', label: 'Tipo', alignRight: false },
   { id: 'store', label: 'Tienda', alignRight: false },
   { id: 'status', label: 'Estado', alignRight: false },
   { id: '' },
@@ -61,7 +60,6 @@ function getComparator(order, orderBy) {
 
 function applySortFilter(array, comparator, query) {
   const stabilizedThis = array.map((el, index) => [el, index]);
-  console.log(stabilizedThis);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) return order;
@@ -71,14 +69,14 @@ function applySortFilter(array, comparator, query) {
     const expresion = new RegExp(`${query}.*`, "i");
     console.log("query", expresion);
     console.log("lista", array);
-  const listado = filter(array, (_jaula) =>  expresion.test(_jaula.jaula) );
+  const listado = filter(array, (_store) =>  expresion.test(_store.destino) );
   console.log(listado);
     return listado
   }
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function CagesPage() {
+export default function StorePage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -93,18 +91,25 @@ export default function CagesPage() {
 
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const [cages, setCages] = useState([]);
+  const [store, setStore] = useState([]);
+
+  const [rows, setRows] = useState({});
+
+  const [ estado, setEstado ] = useState(3);
+
+  // const [ stores, setStore] = useState([]);
+
 
   useEffect(() => {
-    
-    fetch('http://localhost:3089/jaulas/all')
+    console.log(`estado vale ${estado}`);
+    fetch('https://sbs-hulkapitest.dda.sodimac.cl:3090/granel')
       .then((response) => response.json())
       .then((response) => {
-        setCages(response);
+        setStore(response);
         // console.log("jaulassssssssssssssssssssss",response);
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [ estado]);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -113,7 +118,10 @@ export default function CagesPage() {
   const handleCloseMenu = () => {
     setOpen(null);
   };
-
+  const handleclickModal = (destino) => {
+   
+    setRows(destino);
+  }
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -122,7 +130,7 @@ export default function CagesPage() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = cages.map((n) => n.id);
+      const newSelecteds = store.map((n) => n.destino);
       setSelected(newSelecteds);
       return;
     }
@@ -155,34 +163,45 @@ export default function CagesPage() {
 
   const handleFilterByName = (event) => {
     setPage(0);
+    console.log(".....",event.target.value);
     setFilterName(event.target.value);
   };
 
   
-  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - cages.length) : 0;
+  const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - store.length) : 0;
 
-  const filteredUsers = applySortFilter(cages, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(store, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+
+  const successError = (activo) => activo===1 ? 'success' : 'error';
+  const activaedesactivae = activo =>activo===1 ? 'activa' :'desactiva';
+  const activarDesactivar = activo =>activo ? 'activa' : 'desactivada';
+  const errorPaso = activo =>activo ? 'success' : 'error';
 
   return (
     <>
       <Helmet>
-        <title> Cages | Planoper </title>
+        <title> store | Planoper </title>
       </Helmet>
 
       <Container>
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Administración jaulas
+            Administración de tiendas SG
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            nueva jaula
+            nueva tienda
           </Button>
         </Stack>
 
         <Card>
-          <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} type="cage" />
+          <UserListToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+            type="store"
+          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 800 }}>
@@ -191,43 +210,45 @@ export default function CagesPage() {
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
-                  rowCount={cages.length}
+                  rowCount={store.length}
                   numSelected={selected.length}
                   onRequestSort={handleRequestSort}
                   onSelectAllClick={handleSelectAllClick}
                 />
                 <TableBody>
-                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, bodega, status, jaula,hub } = row;
-                    const selectedUser = selected.indexOf(id) !== -1;
-                    console.log(selectedUser);
+                  {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, i) => {
+                    const { origen, activo, destino, zona, tienda } = row;
+                    const selectedUser = selected.indexOf(destino) !== -1;
+                    // console.log(selectedUser);
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={i} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, destino)} />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             {/* <Avatar alt={bodega} src={avatarUrl} /> */}
                             <Typography variant="subtitle2" noWrap>
-                              {jaula}
+                              {destino}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{bodega}</TableCell>
+                        <TableCell align="left">{origen}</TableCell>
 
+                        <TableCell align="left">{zona}</TableCell>
 
-                        <TableCell align="left">{hub}</TableCell>
-
-                        <TableCell align="left">{hub}</TableCell>
+                        <TableCell align="left">{tienda}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === true && 'error') || 'success'}>activo</Label>
+                          <Label color={ successError(activo) }> {activaedesactivae(activo)}</Label>
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e)=> {
+                            handleclickModal(row);
+                            handleOpenMenu(e);
+                          } }>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -269,9 +290,9 @@ export default function CagesPage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
+            rowsPerPageOptions={[30, 50, 100]}
             component="div"
-            count={cages.length}
+            count={store.length}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}
@@ -298,12 +319,12 @@ export default function CagesPage() {
           },
         }}
       >
-        <Modal />
+        <Modal option ={rows} setEstado={setEstado} setStore={setStore} store={store}/>
 
-        <MenuItem sx={{ color: 'error.main' }}>
+        {/* <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Popover>
     </>
   );
