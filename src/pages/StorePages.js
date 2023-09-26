@@ -176,8 +176,7 @@ export default function StorePage() {
 
   const successError = (activo) => activo===1 ? 'success' : 'error';
   const activaedesactivae = activo =>activo===1 ? 'activa' :'desactiva';
-  const activarDesactivar = activo =>activo ? 'activa' : 'desactivada';
-  const errorPaso = activo =>activo ? 'success' : 'error';
+
 
   return (
     <>

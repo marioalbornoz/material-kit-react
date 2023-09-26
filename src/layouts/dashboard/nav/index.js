@@ -5,6 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Link, Drawer, Typography, Avatar, Stack } from '@mui/material';
 // mock
+import { reactLocalStorage } from 'reactjs-localstorage';
 import useAuth from '../../../hooks/useAuth';
 import account from '../../../_mock/account';
 // hooks
@@ -65,11 +66,11 @@ export default function Nav({ openNav, onCloseNav }) {
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2" sx={{ color: 'text.primary' }}>
-                {auth.name}
+              {auth.name ?? reactLocalStorage.getObject('auth').name }
               </Typography>
 
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {auth.id}
+              {auth.name ?? reactLocalStorage.getObject('auth').email }
               </Typography>
             </Box>
           </StyledAccount>

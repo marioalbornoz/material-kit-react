@@ -4,6 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
 // mocks_
 import { useNavigate } from 'react-router-dom';
+import { reactLocalStorage } from 'reactjs-localstorage';
 import account from '../../../_mock/account';
 import useAuth from '../../../hooks/useAuth';
 
@@ -37,6 +38,7 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     navigate('/login', { replace: true })
+    reactLocalStorage.setObject('auth', {})
   };
 
   return (
@@ -82,10 +84,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {auth.name}
+            {auth.name ?? reactLocalStorage.getObject('auth').name }
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {auth.email}
+            {auth.email ?? reactLocalStorage.getObject('auth').email}
           </Typography>
         </Box>
 

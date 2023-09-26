@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
+import { reactLocalStorage } from "reactjs-localstorage";
 
 const { createContext, useState, useEffect } = require("react");
-
 
 export const AuthContext = createContext();
 
@@ -10,14 +10,19 @@ AuthProvider.propTypes = {
    
   };
 function AuthProvider({children}){
-
+    
     const [auth, setAuth] = useState({});
     const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() =>{
-        if(auth){
+        if(auth.name){
             setIsAuthenticated(true);
-        } else setIsAuthenticated(false);
+            reactLocalStorage.setObject("auth", auth);
+            
+
+        } else{ setIsAuthenticated(false)
+            
+        };
     },[auth])
     return(
         <AuthContext.Provider value={{

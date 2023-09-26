@@ -1,5 +1,6 @@
-import { Navigate, useRoutes } from 'react-router-dom';
+import { Navigate, useNavigate, useRoutes } from 'react-router-dom';
 // layouts
+import { useEffect } from 'react';
 import DashboardLayout from './layouts/dashboard';
 import SimpleLayout from './layouts/simple';
 //
@@ -16,16 +17,19 @@ import useAuth from './hooks/useAuth';
 // ----------------------------------------------------------------------
 
 export default function Router() {
-  const {isAuthenticated } = useAuth();
-  console.log('====================================');
-  console.log(isAuthenticated);
-  console.log('====================================');
+  const navigate = useNavigate()
+  const {auth } = useAuth();
+  useEffect(() => {
+    if(!auth.name){
+      navigate('/login');
+    }
+  }, [auth, navigate]);
   const routes = useRoutes([
     {
       path: '/dashboard',
       element: <DashboardLayout />,
       children: [
-        { element: <Navigate to={isAuthenticated ? "/dashboard/app" : "/login"} />, index: true },
+        { element: <Navigate to="/dashboard/app" />, index: true },
         { path: 'app', element: <DashboardAppPage /> },
         { path: 'jaulas', element: <CagesPage /> },
         { path: 'tiendas', element: <StorePage /> },
@@ -44,7 +48,7 @@ export default function Router() {
     {
       element: <SimpleLayout />,
       children: [
-        { element: <Navigate to={ isAuthenticated ? "/dashboard/app" : "/login"} />, index: true }, // si esta logueado resirigir a /dashboard/app sino a /login
+        { element: <Navigate to="/dashboard/app" />, index: true }, // si esta logueado resirigir a /dashboard/app sino a /login
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],
