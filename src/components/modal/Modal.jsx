@@ -7,6 +7,8 @@ import Modal from '@mui/material/Modal';
 import {MenuItem} from '@mui/material';
 import Iconify from "../iconify/Iconify";
 import FormsControl from '../forms/FormsControl';
+import StoreForms from '../forms/StoreForms';
+import CagesForms from '../forms/CagesForms/CagesForms';
 
 
 const style = {
@@ -24,11 +26,24 @@ const style = {
 
 Modals.propTypes = {
   option: PropTypes.object,
+  lista: PropTypes.array,
+  setLista: PropTypes.func,
+  tipo: PropTypes.string
  
 };
 
+const optionalForms = (tipo, option, setLista, lista) => {
+  switch (tipo) {
+    case 'cage':
+      return <CagesForms option={option} setLista={setLista} lista={lista}/>;
+    case'store':
+      return <StoreForms option={option} setLista={setLista} lista={lista}/>;
+    default:
+      return null;
+  }
+}
 
-export default function Modals({option, setEstado, setStore, store}) {
+export default function Modals({option, setLista, lista, tipo}) {
   const [open, setOpen] = React.useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -37,9 +52,9 @@ export default function Modals({option, setEstado, setStore, store}) {
     <div>
       {/* <Button onClick={handleOpen}>Editar</Button> */}
       <MenuItem onClick={handleOpen}>
-          <Iconify  icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-          Edit
-        </MenuItem>
+        <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
+        Edit
+      </MenuItem>
       <Modal
         open={open}
         onClose={handleClose}
@@ -47,10 +62,10 @@ export default function Modals({option, setEstado, setStore, store}) {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h3" >
+          <Typography id="modal-modal-title" variant="h6" component="h3">
             Editar estado {option.destino}
           </Typography>
-          <FormsControl option={option}  setStore={setStore} store={store} />
+          {optionalForms(tipo, option, setLista, lista)}
         </Box>
       </Modal>
     </div>

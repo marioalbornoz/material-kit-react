@@ -8,13 +8,13 @@ import MenuItem from '@mui/material/MenuItem';
 
 // import Visibility from '@mui/icons-material/Visibilit';
 // import VisibilityOff from '@mui/icons-material/VisibilityOff';
-FormsControl.propTypes = {
+StoreForms.propTypes = {
     option: PropTypes.object,
-    lista: PropTypes.array,
-    setLista: PropTypes.func,
+    store: PropTypes.array,
+    setStore: PropTypes.func,
    
   };
-export default function FormsControl({option, setLista, lista}) {
+export default function StoreForms({option, setStore, store}) {
 
     const [active, setActive] = useState(3);
 
@@ -25,18 +25,18 @@ export default function FormsControl({option, setLista, lista}) {
         .then((response) => response.json())
         .then((response) => {
           console.log(response.activo);
-          const elementos = lista.map((la) => {
+          const elementos = store.map((la) => {
             if(la.tienda === option.tienda){
               la.activo = active
             }
             return la;
           });
-          setLista(elementos);
+          setStore(elementos);
         })
         .catch((err) => console.error(err));
        }else console.log("no se envio nada");
       
-    }, [ active, setLista]);
+    }, [ active, setStore]);
 
     const currencies = [
         {

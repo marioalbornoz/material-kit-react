@@ -36,9 +36,19 @@ export default function AccountPopover() {
     setOpen(event.currentTarget);
   };
 
-  const handleClose = () => {
-    navigate('/login', { replace: true })
-    reactLocalStorage.setObject('auth', {})
+  const handleClose = (e) => {
+    console.log(e.target.textContent);
+    switch (e.target.textContent) {
+      case 'Logout':
+        navigate('/login', { replace: true });
+        reactLocalStorage.setObject('auth', {});
+        break;
+
+      default:
+        setOpen(null)
+        break;
+    }
+    
   };
 
   return (

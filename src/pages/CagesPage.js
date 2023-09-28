@@ -95,9 +95,12 @@ export default function CagesPage() {
 
   const [cages, setCages] = useState([]);
 
+  const [rows, setRows] = useState({});
+
+
   useEffect(() => {
     
-    fetch('http://localhost:3089/jaulas/all')
+    fetch('http://sbs-hulkapitest.dda.sodimac.cl:3089/jaulas/all')
       .then((response) => response.json())
       .then((response) => {
         setCages(response);
@@ -120,6 +123,10 @@ export default function CagesPage() {
     setOrderBy(property);
   };
 
+  const handleclickModal = (destino) => {
+   
+    setRows(destino);
+  }
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
       const newSelecteds = cages.map((n) => n.id);
@@ -227,7 +234,10 @@ export default function CagesPage() {
                         </TableCell>
 
                         <TableCell align="right">
-                          <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                          <IconButton size="large" color="inherit" onClick={(e)=> {
+                            handleclickModal(row);
+                            handleOpenMenu(e);
+                          } }>
                             <Iconify icon={'eva:more-vertical-fill'} />
                           </IconButton>
                         </TableCell>
@@ -298,7 +308,7 @@ export default function CagesPage() {
           },
         }}
       >
-        <Modal />
+        <Modal option={rows} setLista={setCages}  lista={cages} tipo="cage" />
 
         <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />

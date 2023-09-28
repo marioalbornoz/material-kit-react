@@ -318,7 +318,7 @@ export default function StorePage() {
           },
         }}
       >
-        <Modal option ={rows} setEstado={setEstado} setStore={setStore} store={store}/>
+        <Modal option ={rows} setLista={setStore} lista={store} tipo="store"/>
 
         {/* <MenuItem sx={{ color: 'error.main' }}>
           <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
