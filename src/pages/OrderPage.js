@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async';
 import { filter } from 'lodash';
 // @mui
 import {
+    Grid,
   Card,
   Table,
   Stack,
@@ -9,37 +10,35 @@ import {
   Button,
   Popover,
   Checkbox,
-  TableRow,
   MenuItem,
-  TableBody,
-  TableCell,
   Container,
   Typography,
   IconButton,
+  TableRow,
+  TableCell,
+  TableBody,
   TableContainer,
   TablePagination,
 } from '@mui/material';
 // components
 import { useEffect, useState } from 'react';
-import products from '../_mock/products';
+import BasicTable from '../components/table/BasicTable';
 import Modal from '../components/modal';
 import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
-import { ProductList } from '../sections/@dashboard/products';
-// mock
-// import CAGESLIST from '../_mock/cages';
+import { DemoScatter } from '../components/colorchartmap/DemoScatter';
 
 // ----------------------------------------------------------------------
 
 const TABLE_HEAD = [
-  { id: 'cage', label: 'Jaula', alignRight: false },
-  { id: 'warehouse', label: 'Bodega', alignRight: false },
-  { id: 'hub', label: 'Hub', alignRight: false },
-  { id: 'store', label: 'Tienda', alignRight: false },
-  { id: 'status', label: 'Estado', alignRight: false },
+  { id: 'cage', label: 'LPN', alignRight: false },
+  { id: 'warehouse', label: 'WAVE', alignRight: false },
+  { id: 'hub', label: 'QTY', alignRight: false },
+  { id: 'store', label: 'STORE', alignRight: false },
+  { id: 'status', label: 'VOL CM3', alignRight: false },
   { id: '' },
 ];
 
@@ -80,7 +79,7 @@ function applySortFilter(array, comparator, query) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-export default function CagesPage() {
+export default function OrdersPage() {
   const [open, setOpen] = useState(null);
 
   const [page, setPage] = useState(0);
@@ -93,23 +92,67 @@ export default function CagesPage() {
 
   const [filterName, setFilterName] = useState("");
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(100);
 
   const [cages, setCages] = useState([]);
 
   const [rows, setRows] = useState({});
 
 
+  const [store, setStore] = useState([]);
+
+  const [sku, setSku] = useState([])
+const [data, setData] = useState([]);
+  function groupby(xs, key) {
+    return xs.reduce((rv, x) => {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+  
   useEffect(() => {
     
-    fetch('http://sbs-hulkapitest.dda.sodimac.cl:3089/jaulas/all')
+    fetch('https://sbs-hulkapi.dda.sodimac.cl:3092/ordersPicker/getList')
       .then((response) => response.json())
       .then((response) => {
         setCages(response);
-        // console.log("jaulassssssssssssssssssssss",response);
+        const listaskubystore = [];
+        const groupByStorage = response.map( res => res.STORE_NUM);
+        const dataArr = new Set(groupByStorage);
+        const result = [...dataArr]
+          setStore(result)
+        const groupbyStore = groupby(response, 'STORE_NUM');
+        Object.entries(groupbyStore).forEach(([key, value]) =>{
+          // console.log(value);
+          const listaSku = value.map(el => el.PRODUCT_SKU);
+          // console.log("listaSku: ", listaSku);
+          listaskubystore.push({store: key, sku:listaSku})
+        });
+        // console.log("agrupado es", listaskubystore);
+        setSku(listaskubystore);
+        // console.log("lista de ordenes",listasku);
       })
       .catch((err) => console.error(err));
   }, []);
+
+
+  useEffect(()=>{
+    console.log("enviando a api nueva..",sku);
+    const myHeaders = new Headers();
+myHeaders.append("Content-Type", "application/json");
+    if(sku.length>0){
+      fetch('http://localhost:3092/ordersPicker/getZone', {
+      method: 'POST',
+      headers: myHeaders,
+      body: JSON.stringify(sku),
+      redirect: 'follow'
+    })
+      .then((response) => response.json())
+      .then((response) => {
+        setData(response);
+      })
+    }
+  }, [sku])
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -180,17 +223,23 @@ export default function CagesPage() {
         <title> Cages | Planoper </title>
       </Helmet>
 
+     
+
       <Container>
+
+     
+          
 
         <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
           <Typography variant="h4" gutterBottom>
-            Administración jaulas
+          Administración ordenes 
           </Typography>
           <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            nueva jaula
+          nueva jaula
           </Button>
-      </Stack>
+        </Stack>
       
+        <DemoScatter  data={data}/>
 
         <Card>
           <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} type="cage" />
@@ -209,32 +258,32 @@ export default function CagesPage() {
                 />
                 <TableBody>
                   {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                    const { id, bodega, status, jaula,hub } = row;
-                    const selectedUser = selected.indexOf(id) !== -1;
-                    console.log(selectedUser);
+                    const { NEW_ORDER_NUMBER, STORE_NUM, status, WAVE_NUMBER,PRODUCTQUANTITY, UNIT_VOLUME } = row;
+                    const selectedUser = selected.indexOf(NEW_ORDER_NUMBER) !== -1;
+                    // console.log(selectedUser);
                     return (
-                      <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableRow hover key={NEW_ORDER_NUMBER} tabIndex={-1} role="checkbox" selected={selectedUser}>
                         <TableCell padding="checkbox">
-                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
+                          <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, NEW_ORDER_NUMBER)} />
                         </TableCell>
 
                         <TableCell component="th" scope="row" padding="none">
                           <Stack direction="row" alignItems="center" spacing={2}>
                             {/* <Avatar alt={bodega} src={avatarUrl} /> */}
                             <Typography variant="subtitle2" noWrap>
-                              {jaula}
+                              {NEW_ORDER_NUMBER}
                             </Typography>
                           </Stack>
                         </TableCell>
-                        <TableCell align="left">{bodega}</TableCell>
+                        <TableCell align="left">{WAVE_NUMBER}</TableCell>
 
 
-                        <TableCell align="left">{hub}</TableCell>
+                        <TableCell align="left">{PRODUCTQUANTITY}</TableCell>
 
-                        <TableCell align="left">{hub}</TableCell>
+                        <TableCell align="left">{STORE_NUM}</TableCell>
 
                         <TableCell align="left">
-                          <Label color={(status === true && 'error') || 'success'}>activo</Label>
+                          <Label color={(status === true && 'error') || 'success'}>{UNIT_VOLUME} cm3</Label>
                         </TableCell>
 
                         <TableCell align="right">

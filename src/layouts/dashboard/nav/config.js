@@ -34,8 +34,8 @@ const navConfig = [
     icon: icon('store'),
   },
   {
-    title: 'Orders',
-    path: '/dashboard/blog',
+    title: 'orders',
+    path: '/dashboard/orders',
     icon: icon('union'),
   },
   {

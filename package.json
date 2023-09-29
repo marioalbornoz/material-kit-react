@@ -38,6 +38,7 @@
     ]
   },
   "dependencies": {
+    "@ant-design/charts": "^1.4.2",
     "@faker-js/faker": "^7.6.0",
     "@iconify/react": "^4.1.0",
     "@mui/icons-material": "^5.14.9",

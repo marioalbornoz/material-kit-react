@@ -1,12 +1,12 @@
 // @mui
 import PropTypes from 'prop-types';
-import { alpha, styled } from '@mui/material/styles';
+import { styled } from '@mui/material/styles';
 import { Card, Typography } from '@mui/material';
 // utils
-import { fShortenNumber } from '../../../utils/formatNumber';
-// components
-import Iconify from '../../../components/iconify';
-
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import BasicTable from '../../../components/table/BasicTable';
 // ----------------------------------------------------------------------
 
 const StyledIcon = styled('div')(({ theme }) => ({
@@ -26,15 +26,15 @@ AppWidgetSummary.propTypes = {
   color: PropTypes.string,
   icon: PropTypes.string,
   title: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
+  lista: PropTypes.array.isRequired,
   sx: PropTypes.object,
 };
 
-export default function AppWidgetSummary({ title, total, icon, color = 'primary', sx, ...other }) {
+export default function AppWidgetSummary({ title, lista, color = 'primary', sx, ...other }) {
   return (
     <Card
       sx={{
-        py: 5,
+        py: 2,
         boxShadow: 0,
         textAlign: 'center',
         color: (theme) => theme.palette[color].darker,
@@ -43,20 +43,27 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
       }}
       {...other}
     >
-      <StyledIcon
-        sx={{
-          color: (theme) => theme.palette[color].dark,
-          backgroundImage: (theme) =>
-            `linear-gradient(135deg, ${alpha(theme.palette[color].dark, 0)} 0%, ${alpha(
-              theme.palette[color].dark,
-              0.24
-            )} 100%)`,
-        }}
-      >
-        <Iconify icon={icon} width={24} height={24} />
-      </StyledIcon>
-
-      <Typography variant="h3">{fShortenNumber(total)}</Typography>
+      
+      <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
+        {title}
+      </Typography>
+      <List sx={{ width: '80%', maxWidth: 360, marginLeft: 3 }}>
+        {lista
+          ? lista.map((value) => (
+              <ListItem
+                key={value}
+                disableGutters
+                // secondaryAction={
+                //   <IconButton aria-label="comment">
+                //     <CommentIcon />
+                //   </IconButton>
+                // }
+              >
+                <ListItemText secondary={`Store ${value}`} />
+              </ListItem>
+            ))
+          : [1, 2, 3]}
+      </List>
 
       <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
         {title}
